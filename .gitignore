@@ -1,13 +1,2 @@
 .idea
-.vagrant
 .DS_Store
-.htaccess
-/vendor/
-/tests/_output/*
-/tests/_support/_generated/
-autoload_classmap.json
-.php_cs.cache
-/Vagrantfile
-output.log
-node_modules
-*DS_Store
