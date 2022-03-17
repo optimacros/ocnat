@@ -10,7 +10,7 @@ SCRIPT_PATH="$(
 )"
 ROUTES_PATH=${SCRIPT_PATH}/routes.json
 
-DEFAULT_ID="om-nat-M4RdjRw2ZhT"
+DEFAULT_ID="M4RdjRw2ZhT"
 CUSTOM_ID=$(jq -r '.id' ${ROUTES_PATH})
 
 if [ "${CUSTOM_ID}" = "null" ]; then
