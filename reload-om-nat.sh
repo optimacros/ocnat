@@ -5,18 +5,17 @@
 set -e
 
 ROUTES_PATH=$1
-
 NODE_NAME=$2
+CUSTOM_CONTEXT_ID=$3
 
 echo "NODE_NAME: ${NODE_NAME}"
 
 DEFAULT_CONTEXT_ID="M4RdjRw2ZhT"
-CUSTOM__CONTEXT_ID=$(jq -r '.id' ${ROUTES_PATH})
 
-if [ "${CUSTOM__CONTEXT_ID}" = "null" ]; then
+if [ "${CUSTOM_CONTEXT_ID}" = "null" ]; then
   CONTEXT_ID="${DEFAULT_CONTEXT_ID}"
 else
-  CONTEXT_ID="${CUSTOM__CONTEXT_ID}"
+  CONTEXT_ID="${CUSTOM_CONTEXT_ID}"
 fi
 
 echo "CONTEXT_ID: ${CONTEXT_ID}"

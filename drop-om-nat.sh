@@ -4,21 +4,17 @@
 
 set -e
 
-SCRIPT_PATH="$(
-  cd "$(dirname "$1")"
-  pwd -P
-)"
-ROUTES_PATH=${SCRIPT_PATH}/routes.json
+ROUTES_PATH=$1
+CUSTOM_CONTEXT_ID=$3
 
-DEFAULT_ID="M4RdjRw2ZhT"
-CUSTOM_ID=$(jq -r '.id' ${ROUTES_PATH})
+DEFAULT_CONTEXT_ID="M4RdjRw2ZhT"
 
-if [ "${CUSTOM_ID}" = "null" ]; then
-  ID="${DEFAULT_ID}"
+if [ "${CUSTOM_CONTEXT_ID}" = "null" ]; then
+  CONTEXT_ID="${DEFAULT_CONTEXT_ID}"
 else
-  ID="${CUSTOM_ID}"
+  CONTEXT_ID="${CUSTOM_CONTEXT_ID}"
 fi
 
-echo "Drop OM NAT: ${ID}"
+echo "CONTEXT_ID: ${CONTEXT_ID}"
 
-iptables-save | grep -v "${ID}" | iptables-restore
+iptables-save | grep -v "${CONTEXT_ID}" | iptables-restore
