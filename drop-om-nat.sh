@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# version: 1.0.1
+
 set -e
 
 SCRIPT_PATH="$(
