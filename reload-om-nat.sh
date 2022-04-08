@@ -28,6 +28,15 @@ get_obj_prop() {
   echo ${DATA} | base64 --decode | jq -r "${KEY}"
 }
 
+get_ports() {
+  local PORTS=$1
+  if [ "${PORTS}" = "null" ]; then
+    echo ""
+  else
+    echo "-m multiport --dports ${PORTS}"
+  fi
+}
+
 drop_rule() {
   local RULE_ID=$1
   echo "Drop rule: ${RULE_ID}"
@@ -82,7 +91,8 @@ if [ "${ROUTES}" != "null" ]; then
     POSTROUTING_RULE="-t nat -A POSTROUTING -s ${FROM_ADDRESS} -o ${TO_INTERFACE} -j ${POSTROUTING_DEST}"
     add_rule "${POSTROUTING_RULE}"
     if [ "${PREROUTING}" = true ]; then
-      PREROUTING_RULE="-t nat -A PREROUTING -p tcp -d ${TO_ADDRESS} -j DNAT --to-destination ${FROM_ADDRESS%/*}"
+      PREROUTING_PORTS=$(get_ports $(get_obj_prop ${row} '.from.ports'))
+      PREROUTING_RULE="-t nat -A PREROUTING -p tcp -d ${TO_ADDRESS} ${PREROUTING_PORTS} -j DNAT --to-destination ${FROM_ADDRESS%/*}"
       add_rule "${PREROUTING_RULE}"
     fi
   done
