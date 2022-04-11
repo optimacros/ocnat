@@ -91,7 +91,7 @@ if [ "${ROUTES}" != "null" ]; then
     POSTROUTING_RULE="-t nat -A POSTROUTING -s ${FROM_ADDRESS} -o ${TO_INTERFACE} -j ${POSTROUTING_DEST}"
     add_rule "${POSTROUTING_RULE}"
     if [ "${PREROUTING}" = true ]; then
-      PREROUTING_PORTS=$(get_ports $(get_obj_prop ${row} '.from.ports'))
+      PREROUTING_PORTS=$(get_ports $(get_obj_prop ${row} '.to.ports'))
       PREROUTING_RULE="-t nat -A PREROUTING -p tcp -d ${TO_ADDRESS} ${PREROUTING_PORTS} -j DNAT --to-destination ${FROM_ADDRESS%/*}"
       add_rule "${PREROUTING_RULE}"
     fi
