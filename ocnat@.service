@@ -6,6 +6,8 @@ ExecStart=/bin/bash /opt/ocnat/reload-om-nat.sh /etc/pve/ocnat/%I.json M4RdjRw2Z
 User=root
 Group=root
 Type=simple
+Restart=always
+RestartSec=60
 
 [Install]
 WantedBy=multi-user.target
