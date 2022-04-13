@@ -1,0 +1,11 @@
+[Unit]
+Description=Optimacros NAT Router %I
+
+[Service]
+ExecStart=/bin/bash /opt/om-nat/reload-om-nat.sh /etc/pve/om-nat/%I.json M4RdjRw2ZhT
+User=root
+Group=root
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

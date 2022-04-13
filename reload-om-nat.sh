@@ -5,10 +5,9 @@
 set -e
 
 ROUTES_PATH=$1
-NODE_NAME=$2
-CUSTOM_CONTEXT_ID=$3
+CUSTOM_CONTEXT_ID=$2
 
-echo "NODE_NAME: ${NODE_NAME}"
+echo "PATH: ${ROUTES_PATH}"
 
 DEFAULT_CONTEXT_ID="M4RdjRw2ZhT"
 
@@ -72,7 +71,7 @@ add_rule() {
   fi
 }
 
-ROUTES=$(jq -r ".nodes.${NODE_NAME}.routes" ${ROUTES_PATH})
+ROUTES=$(jq -r ".routes" ${ROUTES_PATH})
 
 if [ "${ROUTES}" != "null" ]; then
   for row in $(echo "${ROUTES}" | jq -r '.[] | @base64'); do
