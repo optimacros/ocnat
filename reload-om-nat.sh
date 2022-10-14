@@ -71,12 +71,12 @@ add_rule() {
   fi
 }
 
-ROUTES=$(jq -r ".routes" ${ROUTES_PATH})
+POST_ROUTES=$(jq -r ".routes.post" ${ROUTES_PATH})
 
-if [ "${ROUTES}" != "null" ]; then
-  for row in $(echo "${ROUTES}" | jq -r '.[] | @base64'); do
+if [ "${POST_ROUTES}" != "null" ]; then
+  for row in $(echo "${POST_ROUTES}" | jq -r '.[] | @base64'); do
     NAME=$(get_obj_prop ${row} '.name')
-    echo "Add rules to ${NAME}"
+    echo "Add post route rule '${NAME}'"
     FROM_ADDRESS=$(get_obj_prop ${row} '.from.address')
     TO_ADDRESS=$(get_obj_prop ${row} '.to.address')
     TO_INTERFACE=$(get_obj_prop ${row} '.to.interface')
@@ -89,14 +89,41 @@ if [ "${ROUTES}" != "null" ]; then
     fi
     POSTROUTING_RULE="-t nat -A POSTROUTING -s ${FROM_ADDRESS} -o ${TO_INTERFACE} -j ${POSTROUTING_DEST}"
     add_rule "${POSTROUTING_RULE}"
-    if [ "${PREROUTING}" = true ]; then
-      PREROUTING_PORTS=$(get_ports $(get_obj_prop ${row} '.to.ports'))
-      PREROUTING_RULE="-t nat -A PREROUTING -p tcp -d ${TO_ADDRESS} ${PREROUTING_PORTS} -j DNAT --to-destination ${FROM_ADDRESS%/*}"
-      add_rule "${PREROUTING_RULE}"
-    fi
   done
 else
-  echo "Routes not found"
+  echo "Post routes not found"
+fi
+
+PRE_ROUTES=$(jq -r ".routes.pre" ${ROUTES_PATH})
+
+if [ "${PRE_ROUTES}" != "null" ]; then
+  for row in $(echo "${PRE_ROUTES}" | jq -r '.[] | @base64'); do
+    NAME=$(get_obj_prop ${row} '.name')
+    echo "Add pre rule rule '${NAME}'"
+    FROM_ADDRESS=$(get_obj_prop ${row} '.from.address')
+    FROM_INTERFACE=$(get_obj_prop ${row} '.from.interface')
+    FROM_PORTS=$(get_ports $(get_obj_prop ${row} '.from.ports'))
+    TO_ADDRESS=$(get_obj_prop ${row} '.to.address')
+    TO_PORTS=$(get_obj_prop ${row} '.to.ports')
+    POSTROUTING_DEST=""
+    if [ "${FROM_ADDRESS}" = "null" ]; then
+      POSTROUTING_DEST="MASQUERADE"
+    else
+      POSTROUTING_DEST="SNAT --to-source ${FROM_ADDRESS}"
+    fi
+    POSTROUTING_RULE="-t nat -A POSTROUTING -s ${TO_ADDRESS} -o ${FROM_INTERFACE} -j ${POSTROUTING_DEST}"
+    add_rule "${POSTROUTING_RULE}"
+    PREROUTING_DEST=""
+    if [ "${TO_PORTS}" = "null" ]; then
+      PREROUTING_DEST="${TO_ADDRESS%/*}"
+    else
+      PREROUTING_DEST="${TO_ADDRESS%/*}:${TO_PORTS}"
+    fi
+    PREROUTING_RULE="-t nat -A PREROUTING -p tcp -d ${FROM_ADDRESS} ${FROM_PORTS} -j DNAT --to-destination ${PREROUTING_DEST}"
+    add_rule "${PREROUTING_RULE}"
+  done
+else
+  echo "Pre routes not found"
 fi
 
 add_rule "-t raw -I PREROUTING -i fwbr+ -j CT --zone 1"
