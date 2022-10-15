@@ -1,17 +1,31 @@
 {
   "network": {
-    "vm131": {
-      "adapters": [
-        {
-          "id": "net0",
-          "name": "vmbr131",
-          "ipv4": {
-            "subnet": "10.10.1.129/30",
-            "address": "10.10.1.130",
-            "gateway": "10.10.1.129"
-          }
-        }
+    "dns": {
+      "search": [
+        "xxx.org",
+        "xxx.com"
+      ],
+      "servers": [
+        "10.10.1.86",
+        "10.10.1.90"
       ]
+    },
+    "vms": {
+      "vm131": {
+        "adapters": [
+          {
+            "id": "net0",
+            "bridge": "vmbr131",
+            "mac": "XX:XX:XX:XX:XX:XX",
+            "ipv4": {
+              "subnet": "10.10.1.128/30",
+              "address": "10.10.1.130",
+              "gateway": "10.10.1.129",
+              "netmask": "255.255.255.252"
+            }
+          }
+        ]
+      }
     }
   }
 }
