@@ -18,8 +18,12 @@ sudo cp -f /opt/ocnat/apps/cnet/isc-dhcp-server.tpl.example /opt/ocnat/apps/cnet
 sudo cp -f /opt/ocnat/apps/cnet/isc-dhcp-block.tpl.example /opt/ocnat/apps/cnet/isc-dhcp-block.tpl
 sudo cp -f /opt/ocnat/apps/cnet/bridge.tpl.example /opt/ocnat/apps/cnet/bridge.tpl
 sudo cp -f /etc/network/interfaces /etc/network/interfaces.tpl
-echo >> "{VM_BRIDGE_CFG}" > /etc/network/interfaces.tpl
+echo "{VM_BRIDGE_CFG}" >> /etc/network/interfaces.tpl
 ```
+
+Prepare network map configuration `/etc/pve/cnet.json`
+
+See example `apps/cnet/cnet.json.example`
 
 Configure services:
 
@@ -56,7 +60,7 @@ sudo ln -s /etc/pve/cnet /etc/tinc/cnet/hosts
 sudo tincd -n cnet -K
 
 sudo cp -f /opt/ocnat/apps/cnet/cnet.service /etc/systemd/system/cnet.service
-sudo cp -f /opt/ocnat/apps/cnet/cnet-reload.service /etc/systemd/system/cnet-reload.service
+sudo cp -f /opt/ocnat/apps/cnet/cnet-reload.service c
 sudo systemctl start cnet-reload
 sudo systemctl enable cnet-reload
 ```

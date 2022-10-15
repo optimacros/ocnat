@@ -74,19 +74,19 @@ Example:
 }
 ```
 
-Download service and prepare env file (`/etc/systemd/system/.env`):
+Download service and prepare env file (`/opt/ocnat/apps/ocnat/.env`):
 
 ```
 cd /opt
 sudo apt-get install git jq
 sudo git clone https://github.com/optimacros/ocnat
-sudo cp -f ocnat/apps/ocnat/.env.example /etc/systemd/system/.env
+sudo cp -f /opt/ocnat/apps/ocnat/.env.example /opt/ocnat/apps/ocnat/.env
 ```
 
 Configure services:
 
 ```
-sudo cp -f ocnat/apps/ocnat/ocnat.service /etc/systemd/system/ocnat.service
+sudo cp -f /opt/ocnat/apps/ocnat/ocnat.service /etc/systemd/system/ocnat.service
 sudo systemctl start ocnat.service
 sudo systemctl enable ocnat.service
 ```
