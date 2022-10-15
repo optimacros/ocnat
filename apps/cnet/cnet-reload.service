@@ -1,0 +1,13 @@
+[Unit]
+Description=Reload optimacros network configuration
+
+[Service]
+ExecStart=/bin/bash /opt/ocnat/apps/cnet/reload-om-net.sh /opt/ocnat/apps/cnet/.env
+User=root
+Group=root
+Type=simple
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target

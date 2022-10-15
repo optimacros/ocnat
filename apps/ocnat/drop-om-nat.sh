@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# version: 1.0.1
+# version: 1.0.2
 
 set -e
 
-ROUTES_PATH=$1
-CUSTOM_CONTEXT_ID=$2
+ENV_PATH=$1
+
+export $(grep -v '^#' "${ENV_PATH}" | xargs)
 
 DEFAULT_CONTEXT_ID="M4RdjRw2ZhT"
 

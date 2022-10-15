@@ -2,7 +2,7 @@
 Description=Optimacros NAT Router %I
 
 [Service]
-ExecStart=/bin/bash /opt/ocnat/reload-om-nat.sh /etc/pve/ocnat/%I.json M4RdjRw2ZhT
+ExecStart=/bin/bash /opt/ocnat/apps/ocnat/reload-om-nat.sh /opt/ocnat/apps/ocnat/.env
 User=root
 Group=root
 Type=simple
