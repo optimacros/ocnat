@@ -1,4 +1,4 @@
 # apps
 
-- [cnet](./cnet)
-- [ocnat](./ocnat)
+- [cnet](./apps/cnet)
+- [ocnat](./apps/ocnat)
