@@ -1,0 +1,8 @@
+auto {BRIDGE_NAME}
+iface {BRIDGE_NAME} inet static
+        address {GATEWAY}
+        netmask {NETMASK}
+        bridge-ports none
+        bridge-stp off
+        bridge-fd 0
+# {COMMENTS}

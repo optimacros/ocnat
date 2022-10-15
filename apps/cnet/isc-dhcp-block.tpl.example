@@ -1,0 +1,16 @@
+subnet {SUBNET} netmask {NETMASK} {
+    deny client-updates;
+    deny unknown-clients;
+    option routers {GATEWAY};
+    option domain-name-servers {DNS_SERVERS};
+    option domain-search {DNS_SEARCH};
+    default-lease-time 86400;
+    max-lease-time 86400;
+    group {
+        use-host-decl-names on;
+        host {VM_HOST} {
+            hardware ethernet {MAC};
+            fixed-address {ADDRESS};
+        }
+    }
+}

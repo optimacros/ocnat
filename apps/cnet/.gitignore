@@ -1,2 +1,5 @@
 host.tpl
+isc-dhcp-server.tpl
+isc-dhcp-block.tpl
+bridge.tpl
 .env

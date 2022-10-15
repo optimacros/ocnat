@@ -1,5 +1,0 @@
-Address = {WAN_IP}
-Subnet = {LAN_IP}
-{SUBNETS}
-
-{PUBLIC_KEY}

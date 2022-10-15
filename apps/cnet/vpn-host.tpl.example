@@ -1,0 +1,5 @@
+Address = {VPN_WAN_IP}
+Subnet = {VPN_LAN_IP}
+{VPN_SUBNETS}
+
+{VPN_PUB_KEY}
