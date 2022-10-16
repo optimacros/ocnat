@@ -188,6 +188,6 @@ for VM_ADAPTER in $(echo "[${VM_ADAPTERS%?}]" | jq -c -r '.[]'); do
   ID=$(get_obj_prop "${VM_ADAPTER}" '.id')
   VMID=$(get_obj_prop "${VM_ADAPTER}" '.vmid')
   DATA=$(get_obj_prop "${VM_ADAPTER}" '.data')
-  echo "Change VM ${ID}network adapter configuration"
+  echo "Change VM ${ID} network adapter configuration"
   sudo pvesh set /nodes/${NODE_NAME}/qemu/${VMID}/config --${ID} "${DATA}"
 done
