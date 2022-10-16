@@ -5,15 +5,15 @@ update-static-leases on;
 #ddns-updates on;
 #ddns-update-style standard;
 #ddns-ttl 300;
-#ddns-domainname "{DNS_DOMAIN}";
+#ddns-domainname "{DDNS_DOMAIN}";
 
 #key "dhcp-key" {
 #    algorithm hmac-sha256;
-#    secret "{DNS_SECRET}";
+#    secret "{DDNS_SECRET}";
 #};
 
-#zone {DNS_DOMAIN} {
-#        primary {DNS_ADDRESS};
+#zone {DDNS_DOMAIN} {
+#        primary {DDNS_ADDRESS};
 #        key dhcp-key;
 #}
 

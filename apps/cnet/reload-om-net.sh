@@ -169,9 +169,9 @@ fi
 
 # Build DHCP configuration
 DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG_TPL_DATA}" "SUBNETS" "${DHCP_SUBNETS}")
-DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DNS_DOMAIN" "${DNS_DOMAIN}")
-DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DNS_ADDRESS" "${DNS_ADDRESS}")
-DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DNS_SECRET" "${DNS_SECRET}")
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DDNS_DOMAIN" "${DDNS_DOMAIN}")
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DDNS_ADDRESS" "${DDNS_ADDRESS}")
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DDNS_SECRET" "${DDNS_SECRET}")
 
 if [ "${DHCP_CFG_ORIG}" != "${DHCP_CFG}" ]; then
   echo "Change DHCP configuration"
