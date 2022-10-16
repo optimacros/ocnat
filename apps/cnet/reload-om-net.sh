@@ -53,6 +53,7 @@ DHCP_BLOCK_TPL_DATA=$(cat ${DHCP_BLOCK_TPL_PATH})
 BRIDGE_TPL_DATA=$(cat ${BRIDGE_TPL_PATH})
 VPN_HOST_TPL_DATA=$(cat ${VPN_HOST_TPL_PATH})
 NETWORK_CFG_TPL_DATA=$(cat ${NETWORK_CFG_TPL_PATH})
+VM_ADAPTER_TPL_DATA="{\"id\":\"{ID}\",\"vmid\":\"{VMID}\",\"data\":\"{VM_NET_CFG}\"}"
 
 # Static data variables
 NL=$'\n'
@@ -72,6 +73,7 @@ DHCP_INTERFACES=""
 DHCP_CFG=""
 VM_BRIDGE_CFG=""
 VPN_SUBNETS=""
+VM_ADAPTERS=""
 
 if [ "${QEMU_LIST_DATA}" != "[]" ]; then
   for QEMU_DATA in $(echo "${QEMU_LIST_DATA}" | jq -c -s '.[] | sort_by(.vmid)' | jq -c -r '.[]'); do
@@ -124,7 +126,10 @@ if [ "${QEMU_LIST_DATA}" != "[]" ]; then
         VM_NET_CFG=$(replace_variable_tpl "${VM_NET_TPL_DATA}" "MAC" "${MAC}")
         VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "BRIDGE_NAME" "${BRIDGE_NAME}")
         if [ "${VM_NET_CFG_ORIG}" != "${VM_NET_CFG}" ]; then
-          sudo pvesh set /nodes/${NODE_NAME}/qemu/${VMID}/config --net0 "${VM_NET_CFG}"
+          VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER_TPL_DATA}" "ID" "${ID}")
+          VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER}" "VMID" "${VMID}")
+          VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER}" "VM_NET_CFG" "${VM_NET_CFG}")
+          VM_ADAPTERS="${VM_ADAPTERS}${VM_ADAPTER},"
         else
           echo "VM network adapter '${ID}' config was not changed"
         fi
@@ -178,3 +183,11 @@ if [ "${VPN_HOST_CFG_ORIG}" != "${VPN_HOST_CFG}" ]; then
 else
   echo "VPN configuration was not changed"
 fi
+
+for VM_ADAPTER in $(echo "[${VM_ADAPTERS%?}]" | jq -c -r '.[]'); do
+  ID=$(get_obj_prop "${VM_ADAPTER}" '.id')
+  VMID=$(get_obj_prop "${VM_ADAPTER}" '.vmid')
+  DATA=$(get_obj_prop "${VM_ADAPTER}" '.data')
+  echo "Change VM ${ID}network adapter configuration"
+  sudo pvesh set /nodes/${NODE_NAME}/qemu/${VMID}/config --${ID} "${DATA}"
+done
