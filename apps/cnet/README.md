@@ -24,7 +24,7 @@ echo "{VM_BRIDGE_CFG}" >> /etc/network/interfaces.tpl
 
 Prepare network map configuration `/etc/pve/cnet.json`
 
-See example `c`
+See example `apps/cnet/cnet.json.example`
 
 Configure services:
 
