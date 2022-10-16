@@ -97,7 +97,7 @@ if [ "${LXC_LIST_DATA}" != "[]" ]; then
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "lxc")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NET_TPL" "${LXC_NET_TPL_DATA}")
-    VM_COLLECTION="${VM_COLLECTION},${VM_ITEM}"
+    VM_COLLECTION="${VM_COLLECTION}${VM_ITEM},"
   done
 else
   echo "LXC list is empty"
