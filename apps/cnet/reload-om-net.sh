@@ -56,7 +56,7 @@ BRIDGE_TPL_DATA=$(cat ${BRIDGE_TPL_PATH})
 VPN_HOST_TPL_DATA=$(cat ${VPN_HOST_TPL_PATH})
 NETWORK_CFG_TPL_DATA=$(cat ${NETWORK_CFG_TPL_PATH})
 VM_ADAPTER_TPL_DATA="{\"id\":\"{ID}\",\"vmid\":\"{VMID}\",\"type\":\"{TYPE}\",\"data\":\"{VM_NET_CFG}\"}"
-VM_ITEM_TPL_DATA="{\"vmid\":\"{VMID}\",\"type\":\"{TYPE}\",\"net_tpl\":\"{NET_TPL}\"}"
+VM_ITEM_TPL_DATA="{\"vmid\":\"{VMID}\",\"type\":\"{TYPE}\",\"name_field\":\"{NAME_FIELD}\",\"net_tpl\":\"{NET_TPL}\"}"
 
 # Static data variables
 NL=$'\n'
@@ -84,6 +84,7 @@ if [ "${QEMU_LIST_DATA}" != "[]" ]; then
     VMID=$(get_obj_prop "${VM_DATA}" '.vmid')
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "qemu")
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NAME_FIELD" "name")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NET_TPL" "${QEMU_NET_TPL_DATA}")
     VM_COLLECTION="${VM_COLLECTION}${VM_ITEM},"
   done
@@ -96,6 +97,7 @@ if [ "${LXC_LIST_DATA}" != "[]" ]; then
     VMID=$(get_obj_prop "${VM_DATA}" '.vmid')
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "lxc")
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NAME_FIELD" "hostname")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NET_TPL" "${LXC_NET_TPL_DATA}")
     VM_COLLECTION="${VM_COLLECTION}${VM_ITEM},"
   done
@@ -110,11 +112,12 @@ if [ "${VM_COLLECTION}" != "[]" ]; then
     VMID=$(get_obj_prop "${VM_ITEM}" '.vmid')
     TYPE=$(get_obj_prop "${VM_ITEM}" '.type')
     NET_TPL=$(get_obj_prop "${VM_ITEM}" '.net_tpl')
+    NAME_FIELD=$(get_obj_prop "${VM_ITEM}" '.name_field')
     echo "VMID '${VMID}' (${TYPE})"
 
     # Actual VM configuration
     VM_CONFIG_DATA=$(pvesh get /nodes/${NODE_NAME}/${TYPE}/${VMID}/config --output-format json)
-    VM_NAME=$(get_obj_prop "${VM_CONFIG_DATA}" '.name')
+    VM_NAME=$(get_obj_prop "${VM_CONFIG_DATA}" ".${NAME_FIELD}")
 
     ADAPTERS_DATA=$(get_obj_prop "${NET_MAP_CONFIG_DATA}" ".network.vms.vm${VMID}.adapters")
 
