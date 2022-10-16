@@ -1,5 +1,5 @@
 [Unit]
-Description=Tinc cnet
+Description=VPN Networking
 After=network.target corosync.service pve-cluster.service
 
 [Service]

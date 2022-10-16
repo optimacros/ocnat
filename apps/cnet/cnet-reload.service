@@ -1,5 +1,5 @@
 [Unit]
-Description=Reload optimacros network configuration
+Description=Reload VPN network configuration
 
 [Service]
 ExecStart=/bin/bash /opt/ocnat/apps/cnet/reload-om-net.sh /opt/ocnat/apps/cnet/.env

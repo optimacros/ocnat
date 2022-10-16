@@ -1,5 +1,5 @@
 [Unit]
-Description=Optimacros NAT Router %I
+Description=NAT Router %I
 
 [Service]
 ExecStart=/bin/bash /opt/ocnat/apps/ocnat/reload-om-nat.sh /opt/ocnat/apps/ocnat/.env

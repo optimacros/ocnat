@@ -60,7 +60,7 @@ sudo ln -s /etc/pve/cnet /etc/tinc/cnet/hosts
 sudo tincd -n cnet -K
 
 sudo cp -f /opt/ocnat/apps/cnet/cnet.service /etc/systemd/system/cnet.service
-sudo cp -f /opt/ocnat/apps/cnet/cnet-reload.service c
+sudo cp -f /opt/ocnat/apps/cnet/cnet-reload.service /etc/systemd/system/cnet-reload.service
 sudo systemctl start cnet-reload
 sudo systemctl enable cnet-reload
 ```
