@@ -103,7 +103,7 @@ else
   echo "LXC list is empty"
 fi
 
-VM_COLLECTION="[${VM_COLLECTION}]"
+VM_COLLECTION="[${VM_COLLECTION%?}]"
 
 if [ "${VM_COLLECTION}" != "[]" ]; then
   for VM_ITEM in $(echo "${VM_COLLECTION}" | jq -c -s '.[] | sort_by(.vmid)' | jq -c -r '.[]'); do
@@ -161,6 +161,7 @@ if [ "${VM_COLLECTION}" != "[]" ]; then
         VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "BRIDGE_NAME" "${BRIDGE_NAME}")
         VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "ADAPTER_NAME" "${ADAPTER_NAME}")
         VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "GATEWAY" "${GATEWAY}")
+        VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "ADDRESS_SUBNET" "${ADDRESS_SUBNET}")
         if [ "${VM_NET_CFG_ORIG}" != "${VM_NET_CFG}" ]; then
           VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER_TPL_DATA}" "ID" "${ID}")
           VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER}" "VMID" "${VMID}")
