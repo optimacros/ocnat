@@ -80,7 +80,7 @@ VM_ADAPTERS=""
 VM_COLLECTION=""
 
 if [ "${QEMU_LIST_DATA}" != "[]" ]; then
-  for VM_DATA in $(echo "${QEMU_LIST_DATA}" | jq -c -s '.[]'); do
+  for VM_DATA in $(echo "${QEMU_LIST_DATA}" | jq -c -r '.[]'); do
     VMID=$(get_obj_prop "${VM_DATA}" '.vmid')
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "qemu")
@@ -92,7 +92,7 @@ else
 fi
 
 if [ "${LXC_LIST_DATA}" != "[]" ]; then
-  for VM_DATA in $(echo "${LXC_LIST_DATA}" | jq -c -s '.[]'); do
+  for VM_DATA in $(echo "${LXC_LIST_DATA}" | jq -c -r '.[]'); do
     VMID=$(get_obj_prop "${VM_DATA}" '.vmid')
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
     VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "lxc")
