@@ -1,0 +1,20 @@
+authoritative;
+ping-check true;
+update-static-leases on;
+
+ddns-updates on;
+ddns-update-style standard;
+ddns-ttl 300;
+ddns-domainname "{DNS_DOMAIN}";
+
+key "dhcp-key" {
+    algorithm hmac-sha256;
+    secret "{DNS_SECRET}";
+};
+
+zone {DNS_DOMAIN} {
+        primary {DNS_ADDRESS};
+        key dhcp-key;
+}
+
+{SUBNETS}

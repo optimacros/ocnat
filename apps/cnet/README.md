@@ -15,7 +15,8 @@ Prepare templates:
 ```
 sudo cp -f /opt/ocnat/apps/cnet/vpn-host.tpl.example /opt/ocnat/apps/cnet/vpn-host.tpl
 sudo cp -f /opt/ocnat/apps/cnet/isc-dhcp-server.tpl.example /opt/ocnat/apps/cnet/isc-dhcp-server.tpl
-sudo cp -f /opt/ocnat/apps/cnet/isc-dhcp-block.tpl.example /opt/ocnat/apps/cnet/isc-dhcp-block.tpl
+sudo cp -f /opt/ocnat/apps/cnet/isc-dhcp-subnet.tpl.example /opt/ocnat/apps/cnet/isc-dhcp-subnet.tpl
+sudo cp -f /opt/ocnat/apps/cnet/isc-dhcp-cfg.tpl.example /opt/ocnat/apps/cnet/isc-dhcp-cfg.tpl
 sudo cp -f /opt/ocnat/apps/cnet/bridge.tpl.example /opt/ocnat/apps/cnet/bridge.tpl
 sudo cp -f /etc/network/interfaces /etc/network/interfaces.tpl
 echo "{VM_BRIDGE_CFG}" >> /etc/network/interfaces.tpl

@@ -49,7 +49,8 @@ cd ${WORK_DIR}
 # Template data variables
 VM_NET_TPL_DATA="virtio={MAC},bridge={BRIDGE_NAME},firewall=1"
 DHCP_SERVER_TPL_DATA=$(cat ${DHCP_SERVER_TPL_PATH})
-DHCP_BLOCK_TPL_DATA=$(cat ${DHCP_BLOCK_TPL_PATH})
+DHCP_SUBNET_TPL_DATA=$(cat ${DHCP_SUBNET_TPL_PATH})
+DHCP_CFG_TPL_DATA=$(cat ${DHCP_CFG_TPL_PATH})
 BRIDGE_TPL_DATA=$(cat ${BRIDGE_TPL_PATH})
 VPN_HOST_TPL_DATA=$(cat ${VPN_HOST_TPL_PATH})
 NETWORK_CFG_TPL_DATA=$(cat ${NETWORK_CFG_TPL_PATH})
@@ -70,7 +71,7 @@ VPN_HOST_CFG_ORIG=$(cat ${VPN_HOST_CFG_PATH})
 # Runtime variables
 VM_BRIDGES=""
 DHCP_INTERFACES=""
-DHCP_CFG=""
+DHCP_SUBNETS=""
 VM_BRIDGE_CFG=""
 VPN_SUBNETS=""
 VM_ADAPTERS=""
@@ -99,16 +100,16 @@ if [ "${QEMU_LIST_DATA}" != "[]" ]; then
         MAC=$(get_obj_prop "${ADAPTER_DATA}" '.mac')
 
         # Collect DHCP configuration
-        DHCP_BLOCK_DATA="${DHCP_BLOCK_TPL_DATA}"
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "SUBNET" "${SUBNET%/*}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "NETMASK" "${NETMASK}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "GATEWAY" "${GATEWAY}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "DNS_SEARCH" "${DHCP_DNS_SEARCH}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "DNS_SERVERS" "${DHCP_DNS_SERVERS}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "VM_HOST" "${VM_NAME}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "MAC" "${MAC}")
-        DHCP_BLOCK_DATA=$(replace_variable_tpl "${DHCP_BLOCK_DATA}" "ADDRESS" "${ADDRESS}")
-        DHCP_CFG="${DHCP_CFG}${NL}${DHCP_BLOCK_DATA}"
+        DHCP_SUBNET="${DHCP_SUBNET_TPL_DATA}"
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "SUBNET" "${SUBNET%/*}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "NETMASK" "${NETMASK}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "GATEWAY" "${GATEWAY}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "DNS_SEARCH" "${DHCP_DNS_SEARCH}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "DNS_SERVERS" "${DHCP_DNS_SERVERS}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "VM_HOST" "${VM_NAME}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "MAC" "${MAC}")
+        DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "ADDRESS" "${ADDRESS}")
+        DHCP_SUBNETS="${DHCP_SUBNETS}${NL}${DHCP_SUBNET}"
 
         # Collect host network configuration
         VM_BRIDGES="${VM_BRIDGES} ${BRIDGE_NAME}"
@@ -165,6 +166,12 @@ if [ "${NETWORK_CFG_ORIG}" != "${NETWORK_CFG}" ]; then
 else
   echo "Network configuration was not changed"
 fi
+
+# Build DHCP configuration
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG_TPL_DATA}" "SUBNETS" "${DHCP_SUBNETS}")
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DNS_DOMAIN" "${DNS_DOMAIN}")
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DNS_ADDRESS" "${DNS_ADDRESS}")
+DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DNS_SECRET" "${DNS_SECRET}")
 
 if [ "${DHCP_CFG_ORIG}" != "${DHCP_CFG}" ]; then
   echo "Change DHCP configuration"
