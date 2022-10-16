@@ -166,7 +166,7 @@ if [ "${DHCP_CFG_ORIG}" != "${DHCP_CFG}" ]; then
   echo "${DHCP_CFG}" > ${DHCP_CFG_PATH}
   DHCP_SERVER_CFG=$(replace_variable_tpl "${DHCP_SERVER_TPL_DATA}" "INTERFACES" "${VM_BRIDGES}")
   echo "${DHCP_SERVER_CFG}" > ${DHCP_SERVER_PATH}
-  sudo systemctl restart isc-dhcp-server
+  sudo systemctl restart isc-dhcp-server || true
 else
   echo "DHCP configuration was not changed"
 fi
