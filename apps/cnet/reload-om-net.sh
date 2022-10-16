@@ -47,14 +47,16 @@ trap 'rm -rf -- "${WORK_DIR}"' EXIT
 cd ${WORK_DIR}
 
 # Template data variables
-VM_NET_TPL_DATA="virtio={MAC},bridge={BRIDGE_NAME},firewall=1"
+QEMU_NET_TPL_DATA="virtio={MAC},bridge={BRIDGE_NAME},firewall=1"
+LXC_NET_TPL_DATA="name={ADAPTER_NAME},bridge={BRIDGE_NAME},firewall=1,gw={GATEWAY},hwaddr={MAC},ip={ADDRESS_SUBNET},type=veth"
 DHCP_SERVER_TPL_DATA=$(cat ${DHCP_SERVER_TPL_PATH})
 DHCP_SUBNET_TPL_DATA=$(cat ${DHCP_SUBNET_TPL_PATH})
 DHCP_CFG_TPL_DATA=$(cat ${DHCP_CFG_TPL_PATH})
 BRIDGE_TPL_DATA=$(cat ${BRIDGE_TPL_PATH})
 VPN_HOST_TPL_DATA=$(cat ${VPN_HOST_TPL_PATH})
 NETWORK_CFG_TPL_DATA=$(cat ${NETWORK_CFG_TPL_PATH})
-VM_ADAPTER_TPL_DATA="{\"id\":\"{ID}\",\"vmid\":\"{VMID}\",\"data\":\"{VM_NET_CFG}\"}"
+VM_ADAPTER_TPL_DATA="{\"id\":\"{ID}\",\"vmid\":\"{VMID}\",\"type\":\"{TYPE}\",\"data\":\"{VM_NET_CFG}\"}"
+VM_ITEM_TPL_DATA="{\"vmid\":\"{VMID}\",\"type\":\"{TYPE}\",\"net_tpl\":\"{NET_TPL}\"}"
 
 # Static data variables
 NL=$'\n'
@@ -75,14 +77,43 @@ DHCP_SUBNETS=""
 VM_BRIDGE_CFG=""
 VPN_SUBNETS=""
 VM_ADAPTERS=""
+VM_COLLECTION=""
 
 if [ "${QEMU_LIST_DATA}" != "[]" ]; then
-  for QEMU_DATA in $(echo "${QEMU_LIST_DATA}" | jq -c -s '.[] | sort_by(.vmid)' | jq -c -r '.[]'); do
-    VMID=$(get_obj_prop "${QEMU_DATA}" '.vmid')
-    echo "VMID '${VMID}'"
+  for VM_DATA in $(echo "${QEMU_LIST_DATA}" | jq -c -s '.[]'); do
+    VMID=$(get_obj_prop "${VM_DATA}" '.vmid')
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "qemu")
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NET_TPL" "${QEMU_NET_TPL_DATA}")
+    VM_COLLECTION="${VM_COLLECTION},${VM_ITEM}"
+  done
+else
+  echo "Qemu list is empty"
+fi
+
+if [ "${LXC_LIST_DATA}" != "[]" ]; then
+  for VM_DATA in $(echo "${LXC_LIST_DATA}" | jq -c -s '.[]'); do
+    VMID=$(get_obj_prop "${VM_DATA}" '.vmid')
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM_TPL_DATA}" "VMID" "${VMID}")
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "TYPE" "lxc")
+    VM_ITEM=$(replace_variable_tpl "${VM_ITEM}" "NET_TPL" "${LXC_NET_TPL_DATA}")
+    VM_COLLECTION="${VM_COLLECTION},${VM_ITEM}"
+  done
+else
+  echo "LXC list is empty"
+fi
+
+VM_COLLECTION="[${VM_COLLECTION}]"
+
+if [ "${VM_COLLECTION}" != "[]" ]; then
+  for VM_ITEM in $(echo "${VM_COLLECTION}" | jq -c -s '.[] | sort_by(.vmid)' | jq -c -r '.[]'); do
+    VMID=$(get_obj_prop "${VM_ITEM}" '.vmid')
+    TYPE=$(get_obj_prop "${VM_ITEM}" '.type')
+    NET_TPL=$(get_obj_prop "${VM_ITEM}" '.net_tpl')
+    echo "VMID '${VMID}' (${TYPE})"
 
     # Actual VM configuration
-    VM_CONFIG_DATA=$(pvesh get /nodes/${NODE_NAME}/qemu/${VMID}/config --output-format json)
+    VM_CONFIG_DATA=$(pvesh get /nodes/${NODE_NAME}/${TYPE}/${VMID}/config --output-format json)
     VM_NAME=$(get_obj_prop "${VM_CONFIG_DATA}" '.name')
 
     ADAPTERS_DATA=$(get_obj_prop "${NET_MAP_CONFIG_DATA}" ".network.vms.vm${VMID}.adapters")
@@ -92,12 +123,14 @@ if [ "${QEMU_LIST_DATA}" != "[]" ]; then
 
         # Expected VM configuration
         ID=$(get_obj_prop "${ADAPTER_DATA}" '.id')
+        ADAPTER_NAME=$(get_obj_prop "${ADAPTER_DATA}" '.name')
         BRIDGE_NAME=$(get_obj_prop "${ADAPTER_DATA}" '.bridge')
         SUBNET=$(get_obj_prop "${ADAPTER_DATA}" '.ipv4.subnet')
         NETMASK=$(get_obj_prop "${ADAPTER_DATA}" '.ipv4.netmask')
         GATEWAY=$(get_obj_prop "${ADAPTER_DATA}" '.ipv4.gateway')
         ADDRESS=$(get_obj_prop "${ADAPTER_DATA}" '.ipv4.address')
         MAC=$(get_obj_prop "${ADAPTER_DATA}" '.mac')
+        ADDRESS_SUBNET="${ADDRESS}/${SUBNET#*/}"
 
         # Collect DHCP configuration
         DHCP_SUBNET="${DHCP_SUBNET_TPL_DATA}"
@@ -124,11 +157,14 @@ if [ "${QEMU_LIST_DATA}" != "[]" ]; then
         VPN_SUBNETS="${VPN_SUBNETS}${NL}Subnet = ${SUBNET}"
 
         VM_NET_CFG_ORIG=$(get_obj_prop "${VM_CONFIG_DATA}" ".${ID}")
-        VM_NET_CFG=$(replace_variable_tpl "${VM_NET_TPL_DATA}" "MAC" "${MAC}")
+        VM_NET_CFG=$(replace_variable_tpl "${NET_TPL}" "MAC" "${MAC}")
         VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "BRIDGE_NAME" "${BRIDGE_NAME}")
+        VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "ADAPTER_NAME" "${ADAPTER_NAME}")
+        VM_NET_CFG=$(replace_variable_tpl "${VM_NET_CFG}" "GATEWAY" "${GATEWAY}")
         if [ "${VM_NET_CFG_ORIG}" != "${VM_NET_CFG}" ]; then
           VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER_TPL_DATA}" "ID" "${ID}")
           VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER}" "VMID" "${VMID}")
+          VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER}" "TYPE" "${TYPE}")
           VM_ADAPTER=$(replace_variable_tpl "${VM_ADAPTER}" "VM_NET_CFG" "${VM_NET_CFG}")
           VM_ADAPTERS="${VM_ADAPTERS}${VM_ADAPTER},"
         else
@@ -194,7 +230,8 @@ fi
 for VM_ADAPTER in $(echo "[${VM_ADAPTERS%?}]" | jq -c -r '.[]'); do
   ID=$(get_obj_prop "${VM_ADAPTER}" '.id')
   VMID=$(get_obj_prop "${VM_ADAPTER}" '.vmid')
+  TYPE=$(get_obj_prop "${VM_ADAPTER}" '.type')
   DATA=$(get_obj_prop "${VM_ADAPTER}" '.data')
-  echo "Change VM ${ID} network adapter configuration"
-  sudo pvesh set /nodes/${NODE_NAME}/qemu/${VMID}/config --${ID} "${DATA}"
+  echo "Change VM ${ID} (${TYPE}) network adapter configuration"
+  sudo pvesh set /nodes/${NODE_NAME}/${TYPE}/${VMID}/config --${ID} "${DATA}"
 done
