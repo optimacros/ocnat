@@ -184,7 +184,7 @@ fi
 
 # Drop unused interfaces
 for BRIDGE_NAME in $(ip -j addr show | jq -c -r .[].ifname | grep ^vmbr); do
-  if [[ "${VM_BRIDGES}" != *"${BRIDGE_NAME}"* ]]; then
+  if [[ "${VM_BRIDGES}" != *"|${BRIDGE_NAME}|"* ]]; then
     echo "Drop insterface: ${BRIDGE_NAME}"
     sudo ifconfig ${BRIDGE_NAME} down
     sudo ip link delete ${BRIDGE_NAME}
