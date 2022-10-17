@@ -71,8 +71,7 @@ DHCP_CFG_ORIG=$(cat ${DHCP_CFG_PATH})
 VPN_HOST_CFG_ORIG=$(cat ${VPN_HOST_CFG_PATH})
 
 # Runtime variables
-VM_BRIDGES=""
-DHCP_INTERFACES=""
+VM_BRIDGES=" "
 DHCP_SUBNETS=""
 VM_BRIDGE_CFG=""
 VPN_SUBNETS=""
@@ -148,7 +147,7 @@ if [ "${VM_COLLECTION}" != "[]" ]; then
         DHCP_SUBNETS="${DHCP_SUBNETS}${NL}${DHCP_SUBNET}"
 
         # Collect host network configuration
-        VM_BRIDGES="${VM_BRIDGES} ${BRIDGE_NAME}"
+        VM_BRIDGES="${VM_BRIDGES}${BRIDGE_NAME} "
         VM_BRIDGE_DATA="${BRIDGE_TPL_DATA}"
         VM_BRIDGE_DATA=$(replace_variable_tpl "${VM_BRIDGE_DATA}" "BRIDGE_NAME" "${BRIDGE_NAME}")
         VM_BRIDGE_DATA=$(replace_variable_tpl "${VM_BRIDGE_DATA}" "GATEWAY" "${GATEWAY}")
