@@ -64,4 +64,6 @@ sudo cp -f /opt/ocnat/apps/cnet/cnet.service /etc/systemd/system/cnet.service
 sudo cp -f /opt/ocnat/apps/cnet/cnet-reload.service /etc/systemd/system/cnet-reload.service
 sudo systemctl start cnet-reload
 sudo systemctl enable cnet-reload
+sudo systemctl start cnet
+sudo systemctl enable cnet
 ```
