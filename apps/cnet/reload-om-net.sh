@@ -71,7 +71,8 @@ DHCP_CFG_ORIG=$(cat ${DHCP_CFG_PATH})
 VPN_HOST_CFG_ORIG=$(cat ${VPN_HOST_CFG_PATH})
 
 # Runtime variables
-VM_BRIDGES=" "
+VM_BRIDGES="|"
+DHCP_INTERFACES=""
 DHCP_SUBNETS=""
 VM_BRIDGE_CFG=""
 VPN_SUBNETS=""
@@ -145,9 +146,10 @@ if [ "${VM_COLLECTION}" != "[]" ]; then
         DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "MAC" "${MAC}")
         DHCP_SUBNET=$(replace_variable_tpl "${DHCP_SUBNET}" "ADDRESS" "${ADDRESS}")
         DHCP_SUBNETS="${DHCP_SUBNETS}${NL}${DHCP_SUBNET}"
+        DHCP_INTERFACES="${DHCP_INTERFACES} ${BRIDGE_NAME}"
 
         # Collect host network configuration
-        VM_BRIDGES="${VM_BRIDGES}${BRIDGE_NAME} "
+        VM_BRIDGES="${VM_BRIDGES}${BRIDGE_NAME}|"
         VM_BRIDGE_DATA="${BRIDGE_TPL_DATA}"
         VM_BRIDGE_DATA=$(replace_variable_tpl "${VM_BRIDGE_DATA}" "BRIDGE_NAME" "${BRIDGE_NAME}")
         VM_BRIDGE_DATA=$(replace_variable_tpl "${VM_BRIDGE_DATA}" "GATEWAY" "${GATEWAY}")
@@ -215,7 +217,7 @@ DHCP_CFG=$(replace_variable_tpl "${DHCP_CFG}" "DDNS_SECRET" "${DDNS_SECRET}")
 if [ "${DHCP_CFG_ORIG}" != "${DHCP_CFG}" ]; then
   echo "Change DHCP configuration"
   echo "${DHCP_CFG}" > ${DHCP_CFG_PATH}
-  DHCP_SERVER_CFG=$(replace_variable_tpl "${DHCP_SERVER_TPL_DATA}" "INTERFACES" "${VM_BRIDGES}")
+  DHCP_SERVER_CFG=$(replace_variable_tpl "${DHCP_SERVER_TPL_DATA}" "INTERFACES" "${DHCP_INTERFACES}")
   echo "${DHCP_SERVER_CFG}" > ${DHCP_SERVER_PATH}
   sudo systemctl restart isc-dhcp-server || true
 else
