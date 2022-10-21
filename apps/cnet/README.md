@@ -29,6 +29,8 @@ See example `apps/cnet/cnet.json.example`
 Configure services:
 
 ```
+export $(grep -v '^#' /opt/ocnat/apps/cnet/.env | xargs)
+
 sudo mkdir /etc/tinc/cnet/
 
 cat <<EOT > /etc/tinc/cnet/tinc.conf
