@@ -62,7 +62,7 @@ sudo ln -s /etc/pve/cnet /etc/tinc/cnet/hosts
 # Create key files in default paths with command
 sudo tincd -n cnet -K
 
-sudo touch ${VPN_HOST_CFG_PATH}
+sudo touch $VPN_HOST_CFG_PATH
 sudo cp -f /opt/ocnat/apps/cnet/cnet.service /etc/systemd/system/cnet.service
 sudo cp -f /opt/ocnat/apps/cnet/cnet-reload.service /etc/systemd/system/cnet-reload.service
 sudo systemctl start cnet-reload
