@@ -34,7 +34,7 @@ export $(grep -v '^#' /opt/ocnat/apps/cnet/.env | xargs)
 sudo mkdir /etc/tinc/cnet/
 
 cat <<EOT > /etc/tinc/cnet/tinc.conf
-Name = $HOST_NAME
+Name = $VPN_HOST_NAME
 Device = /dev/net/tun
 AddressFamily = ipv4
 ConnectTo = yyy
