@@ -57,6 +57,8 @@ ip addr del $VPN_LAN_IP dev \$INTERFACE
 ip link set \$INTERFACE down
 EOT
 
+sudo chmod -v +x /etc/tinc/cnet/tinc-{up,down}
+
 sudo ln -s /etc/pve/cnet /etc/tinc/cnet/hosts
 
 # Create key files in default paths with command
