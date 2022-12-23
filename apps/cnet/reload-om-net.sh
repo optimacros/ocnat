@@ -71,6 +71,7 @@ DHCP_CFG_ORIG=$(cat ${DHCP_CFG_PATH})
 VPN_HOST_CFG_ORIG=$(cat ${VPN_HOST_CFG_PATH})
 
 # Runtime variables
+SYSTEM_BRIDGES="|"
 VM_BRIDGES="|"
 DHCP_INTERFACES=""
 DHCP_SUBNETS=""
@@ -78,6 +79,12 @@ VM_BRIDGE_CFG=""
 VPN_SUBNETS=""
 VM_ADAPTERS=""
 VM_COLLECTION=""
+
+# Prepare system bridges
+for SYSTEM_BRIDGE_INDEX in {0..99}
+do
+   SYSTEM_BRIDGES="${SYSTEM_BRIDGES}${SYSTEM_BRIDGE_INDEX}|"
+done
 
 if [ "${QEMU_LIST_DATA}" != "[]" ]; then
   for VM_DATA in $(echo "${QEMU_LIST_DATA}" | jq -c -r '.[]'); do
@@ -183,8 +190,9 @@ else
 fi
 
 # Drop unused interfaces
+SRC_BRIDGES="${SYSTEM_BRIDGES}${VM_BRIDGES}"
 for BRIDGE_NAME in $(ip -j addr show | jq -c -r .[].ifname | grep ^vmbr); do
-  if [[ "${VM_BRIDGES}" != *"|${BRIDGE_NAME}|"* ]]; then
+  if [[ "${SRC_BRIDGES}" != *"|${BRIDGE_NAME}|"* ]]; then
     echo "Drop insterface: ${BRIDGE_NAME}"
     sudo ifconfig ${BRIDGE_NAME} down
     # sudo ip link delete ${BRIDGE_NAME}
