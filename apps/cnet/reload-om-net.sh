@@ -83,7 +83,7 @@ VM_COLLECTION=""
 # Prepare system bridges
 for SYSTEM_BRIDGE_INDEX in {0..99}
 do
-   SYSTEM_BRIDGES="${SYSTEM_BRIDGES}${SYSTEM_BRIDGE_INDEX}|"
+   SYSTEM_BRIDGES="${SYSTEM_BRIDGES}vmbr${SYSTEM_BRIDGE_INDEX}|"
 done
 
 if [ "${QEMU_LIST_DATA}" != "[]" ]; then
